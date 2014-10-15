@@ -5,22 +5,29 @@ Skyrocket for Wordpress Cache
 
 Before using a system like this, make sure you have reliable and regular backups!
 
-*Initial version, we need to calculate the available size, and the required size to prevent any problems.*
 
-
-Install
+Install & configuration
 ------
+Cron recommendation: */15 * * * * /root/scripts/skyrocket-wp-cache.php >/root/scripts/cron.log
+
+For specific configuration, see head of file
+
 Current configuration works for Debian 6-7, and ISPConfig (even chrooted).
+
+
+Requirement
+------
+Free memory must be ramdisk size + 25%
 
 
 TODO
 ------
 Check path protection
 
-Check free space
+Keep a correct ramdisk space
 
-Check required space
+Allow deleting the directory while is mounted
 
-Allow deleting the directory while it is mounted
+Detect errors and restore by default
 
-Detect errors and restore by default (using a sempahore)
+Using semaphore to prevent conflicts
