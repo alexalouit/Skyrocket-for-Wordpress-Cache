@@ -105,6 +105,8 @@ if(!is_dir($ramdisk_dir)) {
 		print("Skyrocket: (ERROR) can't create directory " . $ramdisk_dir . "\n");
 		exit;
 	}
+
+		sleep(1);
 }
 
 // TODO : ->
@@ -130,6 +132,8 @@ if(strpos($currently_mounts, "tmpfs " . $ramdisk_dir . " tmpfs") === FALSE) {
 	}
 
 	exec("mount -t tmpfs -o size=" . $ramdisk_size . "k,rw,nosuid,nodev tmpfs " . $ramdisk_dir);
+
+	sleep(1);
 
 	// Refresh mount list
 	$currently_mounts = currently_mounts($mounted_file);
@@ -161,7 +165,7 @@ if(!$current_dir = glob($vhost_path)) {
 foreach($current_dir as $path) {
 	// Check is empty
 	if(empty(glob($path . "/*"))) {
-		print("Skyrocket: (INFO) directory found but empty: " . $path . "\n");
+		print("Skyrocket: (INFO) directory found but empty: " . $path . ". Abort\n");
 		continue;
 	}
 
@@ -174,6 +178,32 @@ foreach($current_dir as $path) {
 
 		if(!mkdir($ramdisk_dir . "/" . $usuable_path, 755)) {
 			print("Skyrocket: (ERROR) can't create dedicated directory for " . $path . "\n");
+			continue;
+		}
+
+		sleep(1);
+
+		// Get the proper owners
+		if(!$owners = stat($path)) {
+			print("Skyrocket: (ERROR) can't get owners directory " . $path . "\n");
+			continue;
+		}
+
+		// Apply proper owners
+		print("Skyrocket: (INFO) applying correct owners (" . $owners["uid"] . ":" . $owners["gid"] . ") on directory " . $ramdisk_dir . "/" . $usuable_path . "\n");
+		exec("chown -R " . $owners["uid"] . ":" . $owners["gid"] . " " . $ramdisk_dir . "/" . $usuable_path);
+
+		sleep(1);
+
+		// Get new owners
+		if(!$current_owners = stat($ramdisk_dir . "/" . $usuable_path)) {
+			print("Skyrocket: (ERROR) can't get owners directory " . $ramdisk_dir . "/" . $usuable_path . "\n");
+			continue;
+		}
+
+		// Check owners
+		if($current_owners["uid"] != $owners["uid"] OR $current_owners["gid"] != $owners["gid"]) {
+			print("Skyrocket: (ERROR) we haven't been able to apply right owners on" . $ramdisk_dir . "/" . $usuable_path . "\n");
 			continue;
 		}
 
@@ -191,6 +221,8 @@ foreach($current_dir as $path) {
 			print("Skyrocket: (INFO) delete unnecessary directory " . $ramdisk_dir . "/" . $usuable_path . "\n");
 			exec("rm -r " . $ramdisk_dir . "/" . $usuable_path);
 
+			sleep(1);
+
 			if(is_dir($ramdisk_dir . "/" . $usuable_path)) {
 				print("Skyrocket: (ERROR) can't delete directory " . $ramdisk_dir . "/" . $usuable_path . "\n");
 			}
@@ -199,8 +231,10 @@ foreach($current_dir as $path) {
 			continue;
 		}
 		// Copy content recursively
-		exec("cp -R " . $path . "/* " . $ramdisk_dir . "/" . $usuable_path);
-// TODO: CHECK COPY
+		exec("cp --recursive --preserve=mode,ownership,timestamps " . $path . "/* " . $ramdisk_dir . "/" . $usuable_path);
+
+		sleep(1);
+// TODO: CHECK COPY (md5? list content? size?)
 	}
 
 	// Check is mounted
@@ -208,6 +242,8 @@ foreach($current_dir as $path) {
 		// Mount it
 		print("Skyrocket: (INFO) mount to dedicated directory for " . $path . " to " . $ramdisk_dir . "/" . $usuable_path . "\n");
 		exec("mount --bind " . $ramdisk_dir . "/" . $usuable_path . " " . $path);
+
+		sleep(1);
 
 		// Refresh mount list
 		$currently_mounts = currently_mounts($mounted_file);
@@ -218,6 +254,8 @@ foreach($current_dir as $path) {
 			// Delete directory with content
 			print("Skyrocket: (INFO) delete unnecessary directory for " . $ramdisk_dir . "/" . $usuable_path . "\n");
 			exec("rm -r " . $ramdisk_dir . "/" . $usuable_path);
+
+			sleep(1);
 
 			if(is_dir($ramdisk_dir . "/" . $usuable_path)) {
 				print("Skyrocket: (ERROR) can't delete directory " . $ramdisk_dir . "/" . $usuable_path . "\n");
@@ -242,6 +280,8 @@ foreach($currently_cached as $usuable_path) {
 		print("Skyrocket: (INFO) unmount unnecessary point for " . $path . "\n");
 		exec("umount " . $path);
 
+		sleep(1);
+
 		// Refresh mount list
 		$currently_mounts = currently_mounts($mounted_file);
 
@@ -256,6 +296,8 @@ foreach($currently_cached as $usuable_path) {
 		print("Skyrocket: (INFO) delete unnecessary directory for " . $path . " to " . $ramdisk_dir . "/" . $usuable_path . "\n");
 		exec("rm -r " . $ramdisk_dir . "/" . $usuable_path);
 
+		sleep(1);
+
 		if(is_dir($ramdisk_dir . "/" . $usuable_path)) {
 			print("Skyrocket: (ERROR) can't delete  directory " . $ramdisk_dir . "/" . $usuable_path . "\n");
 		}
@@ -263,6 +305,8 @@ foreach($currently_cached as $usuable_path) {
 		// Delete directory content
 		print("Skyrocket: (INFO) delete content directory " . $path . " for synchronization and prevent loops\n");
 		exec("rm -r " . $path . "/*");
+
+		sleep(1);
 
 		if(!empty(glob($path))) {
 			print("Skyrocket: (ERROR) can't delete content  directory " . $path . "\n");
