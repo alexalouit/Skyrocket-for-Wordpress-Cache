@@ -143,7 +143,7 @@ if(strpos($currently_mounts, "tmpfs " . $ramdisk_dir . " tmpfs") === FALSE) {
 		print("Skyrocket: (ERROR) unable to mount " . $ramdisk_dir . " correctly" . "\n");
 		exit;
 	}
-	print("Skyrocket: (INFO) " . $ramdisk_dir . " was mounted correctly" . "\n");
+	print("Skyrocket: (INFO) " . $ramdisk_dir . " was mounted correctly\n");
 }
 
 if(!scandir($ramdisk_dir)) {

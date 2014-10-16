@@ -6,7 +6,7 @@ Skyrocket for Wordpress Cache
 Before using a system like this, make sure you have reliable and regular backups!
 
 
-First tests are given good result, 400ms to 500ms (950ms to 600ms) gain for DOM loading on lightweight websites.
+First tests are given good result, 400ms to 500ms gain (950ms to 600ms) for DOM loading on lightweight websites.
 
 
 Install & configuration
@@ -29,11 +29,7 @@ TODO
 ------
 Check path protection
 
-Create directory with good owner
-
-Copying with same owner
-
-Keep a correct ramdisk space
+Keep a safe ramdisk space
 
 Allow deleting the directory while is mounted
 
